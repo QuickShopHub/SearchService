@@ -21,9 +21,15 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @PostMapping(path = "/search")
+    @PostMapping(path = "/query")
     public List<ProductForSearch> searchProducts(@RequestBody SearchRequest query) {
         return searchService.search(query);
+    }
+
+    @PostMapping(path = "/newProduct")
+    public ProductForSearch newProduct(@RequestBody ProductForSearch product) {
+
+        return searchService.addNewProductForSearch(product);
     }
 
 }
