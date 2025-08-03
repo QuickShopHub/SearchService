@@ -26,10 +26,4 @@ public class SearchController {
         return searchService.search(query);
     }
 
-    @PostMapping(path = "/newProduct")
-    public ProductForSearch newProduct(@RequestBody ProductForSearch product) {
-
-        return searchService.addNewProductForSearch(product);
-    }
-
 }

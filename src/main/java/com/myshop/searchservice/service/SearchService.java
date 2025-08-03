@@ -105,23 +105,6 @@ public class SearchService {
 
 
 
-    public ProductForSearch addNewProductForSearch(ProductForSearch productForSearch) {
 
-        try {
-            // Выполняем индексацию
-            IndexResponse response = elasticsearchClient.index(builder -> builder
-                    .index("products")                    // имя индекса
-                    .id(productForSearch.getId().toString())         // используем ID из объекта (или можно не указывать — тогда ES сгенерирует)
-                    .document(productForSearch)           // сам объект
-                    .refresh(Refresh.True)                // делаем документ сразу доступным для поиска
-            );
-            log.info("Запись создана");
-            return productForSearch; // возвращаем объект с ID
-
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при сохранении продукта в Elasticsearch", e);
-        }
-
-    }
 
 }

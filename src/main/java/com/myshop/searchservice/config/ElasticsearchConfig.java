@@ -119,45 +119,6 @@ public class ElasticsearchConfig {
     }
 
 
-//    @Bean
-//    @DependsOn("elasticsearchClient")
-//    public ApplicationRunner createIndexRunner(ElasticsearchClient elasticsearchClient) {
-//        return args -> {
-//            try {
-//                BooleanResponse existsResponse = elasticsearchClient.indices()
-//                        .exists(b -> b.index("products"));
-//
-//                if (!existsResponse.value()) {
-//                    CreateIndexResponse createResponse = elasticsearchClient.indices().create(c -> c
-//                            .index("products")
-//                            .settings(s -> s
-//                                    .numberOfShards("1")
-//                                    .numberOfReplicas("0")
-//                            )
-//                            .mappings(m -> m
-//                                    .properties("id", p -> p.keyword(k -> k))
-//                                    .properties("name", p -> p.text(t -> t))
-//                                    .properties("description", p -> p.text(t -> t))
-//                                    .properties("price", p -> p.double_(d -> d))
-//                                    .properties("categories", p -> p.keyword(k -> k))
-//                            )
-//                    );
-//
-//                    if (createResponse.acknowledged()) {
-//                        log.info("Индекс 'products' успешно создан");
-//                    } else {
-//                        log.warn("Индекс 'products' не был создан (не подтверждён)");
-//                    }
-//                } else {
-//                    log.info("Индекс 'products' уже существует");
-//                }
-//            } catch (Exception e) {
-//                log.error(" Ошибка при создании индекса", e); // ← полный стек
-//                throw new RuntimeException("Ошибка при создании индекса: " + e.getMessage(), e);
-//            }
-//        };
-//    }
-
 
     @Bean
     @DependsOn("elasticsearchClient")
