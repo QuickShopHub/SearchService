@@ -10,6 +10,10 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.myshop.searchservice.DTO.ProductForSearch;
 import com.myshop.searchservice.DTO.SearchRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -27,26 +31,37 @@ public class SearchService {
         this.elasticsearchClient = elasticsearchClient;
     }
 
-    public List<ProductForSearch> search(SearchRequest searchRequest) {
+    public Page<ProductForSearch> search(SearchRequest searchRequest, Pageable pageable) {
 
         BoolQuery.Builder bool = getBuilder(searchRequest);
 
         if(bool == null) {
-            return List.of();
+            return Page.empty(pageable);
         }
 
         try {
             SearchResponse<ProductForSearch> response = elasticsearchClient.search(s -> s
                             .index("products")
                             .query(bool.build()._toQuery())
-                            .from(searchRequest.getPage() * searchRequest.getSize())
-                            .size(searchRequest.getSize()),
+                            .from((int) pageable.getOffset())
+                            .size(pageable.getPageSize())
+                            .trackTotalHits(t -> t.enabled(true)),
                     ProductForSearch.class
             );
             log.info("Поиск окончен");
-            return response.hits().hits().stream()
+
+            // Извлекаем список найденных объектов
+            List<ProductForSearch> results = response.hits().hits().stream()
                     .map(Hit::source)
                     .collect(Collectors.toList());
+
+
+            long totalHits = response.hits().total().value();
+
+
+
+            // Возвращаем Page
+            return new PageImpl<>(results, pageable, totalHits);
 
         } catch (IOException e) {
             log.error("Ошибка при поиске");
