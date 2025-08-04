@@ -12,15 +12,14 @@ elasticsearch:
 server:
   port: 8081
 
-spring:
-  kafka:
-    consumer:
-      bootstrap-servers: localhost:9092
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      group-id: updateConsumer_v2
-      auto-offset-reset: earliest
-      properties:
-        spring.json.trusted.packages: "*"
-        spring.json.value.default.type: com.myshop.searchservice.DTO
-
+#spring:
+#  kafka:
+#    consumer:
+#      bootstrap-servers: localhost:9092
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#      group-id: updateConsumer_v2
+#      auto-offset-reset: earliest
+#      properties:
+#        spring.json.trusted.packages: "*"
+#        spring.json.value.default.type: com.myshop.searchservice.DTO

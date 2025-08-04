@@ -7,13 +7,17 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.UpdateResponse;
+import com.myshop.searchservice.DTO.DeleteDTO;
 import com.myshop.searchservice.DTO.ProductForSearch;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,7 +29,7 @@ public class KafkaConsumer {
         this.elasticsearchClient = elasticsearchClient;
     }
 
-    @KafkaListener(topics = "updateElastic")
+    @KafkaListener(topics = "updateElastic", containerFactory = "kafkaListenerContainerFactoryUpdate")
     public void addNewProduct(ProductForSearch productForSearch) {
         try {
             log.info("Received message: {}", productForSearch);
@@ -51,20 +55,22 @@ public class KafkaConsumer {
     }
 
 
-    @KafkaListener(topics = "deleteElastic")
-    public void deleteProduct(List<UUID> ids) {
+    @KafkaListener(topics = "deleteElastic", containerFactory = "kafkaListenerContainerFactoryDelete")
+    public void deleteProduct(DeleteDTO idsDTO) {
+        List<UUID> ids = idsDTO.getIds();
         try {
             log.info("Received message: {}", ids);
 
-            if (ids == null || ids.isEmpty()) {
+            if (ids == null) {
                 log.warn("No product IDs to delete");
                 return;
             }
 
             try {
-
                 BulkRequest.Builder bulkBuilder = new BulkRequest.Builder();
 
+
+                log.info("ids: {}", ids);
                 ids.forEach(id -> {
                     bulkBuilder.operations(op -> op
                             .delete(del -> del
@@ -102,6 +108,4 @@ public class KafkaConsumer {
             throw e; // Для повторной обработки
         }
     }
-
-
 }
