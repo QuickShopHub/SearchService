@@ -31,9 +31,11 @@ public class SearchService {
         this.elasticsearchClient = elasticsearchClient;
     }
 
-    public Page<ProductForSearch> search(SearchRequest searchRequest, Pageable pageable) {
+    public Page<ProductForSearch> search(SearchRequest searchRequest) {
 
         BoolQuery.Builder bool = getBuilder(searchRequest);
+
+        Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize());
 
         if(bool == null) {
             return Page.empty(pageable);
@@ -113,7 +115,6 @@ public class SearchService {
 //            bool.filter(range.build()._toQuery());
 //        }
         //и так далее
-
 
         return bool;
     }

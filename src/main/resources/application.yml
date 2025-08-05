@@ -11,6 +11,11 @@ elasticsearch:
 
 server:
   port: 8081
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12  # путь к .p12 файлу
+    key-store-password: changeit  # пароль от .p12
+    key-store-type: PKCS12
 
 #spring:
 #  kafka:

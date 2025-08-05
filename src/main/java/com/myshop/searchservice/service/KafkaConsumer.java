@@ -6,18 +6,18 @@ import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
-import co.elastic.clients.elasticsearch.core.UpdateResponse;
+
 import com.myshop.searchservice.DTO.DeleteDTO;
 import com.myshop.searchservice.DTO.ProductForSearch;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -74,8 +74,8 @@ public class KafkaConsumer {
                 ids.forEach(id -> {
                     bulkBuilder.operations(op -> op
                             .delete(del -> del
-                                    .index("products")           // имя индекса
-                                    .id(id.toString())           // UUID -> строка
+                                    .index("products")
+                                    .id(id.toString())
                             )
                     );
                 });

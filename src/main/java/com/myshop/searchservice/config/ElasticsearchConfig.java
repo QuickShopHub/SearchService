@@ -61,8 +61,6 @@ public class ElasticsearchConfig {
 
     private SSLContext createSslContext() throws Exception {
         log.info("Начинаем создание SSLContext...");
-        log.info("Truststore path: {}", truststorePath);
-        log.info("Truststore password: {}", truststorePassword);
 
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 

@@ -25,11 +25,8 @@ public class SearchController {
     }
 
     @PostMapping(path = "/query")
-    public Page<ProductForSearch> searchProducts(
-            @RequestBody SearchRequest query,
-            @RequestParam(defaultValue = "0", name = "page", required = false) int page,
-            @RequestParam(defaultValue = "1", name = "size", required = false) int size) {
-        return searchService.search(query, PageRequest.of(page, size));
+    public Page<ProductForSearch> searchProducts(@RequestBody SearchRequest query) {
+        return searchService.search(query);
     }
 
 }
