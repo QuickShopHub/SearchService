@@ -8,6 +8,10 @@ import com.myshop.searchservice.DTO.ProductForSearch;
 import com.myshop.searchservice.DTO.SearchRequest;
 import com.myshop.searchservice.service.SearchService;
 
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +32,11 @@ public class SearchController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping(path = "/query")
-    public Page<ProductForSearch> searchProducts(@RequestBody SearchRequest query) {
-        return searchService.search(query);
+    public ResponseEntity<PagedModel<EntityModel<ProductForSearch>>> searchProducts(@RequestBody SearchRequest query,
+                                                                                    PagedResourcesAssembler<ProductForSearch> pagedResourcesAssembler) {
+        Page<ProductForSearch> page = searchService.search(query);
+        PagedModel<EntityModel<ProductForSearch>> pagedModel = pagedResourcesAssembler.toModel(page);
+        return ResponseEntity.ok(pagedModel);
     }
 
 }
