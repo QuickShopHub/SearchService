@@ -24,4 +24,5 @@ public class ProductForSearch {
     private BigDecimal rating;
     private long quantitySold;
     private String url;
+    private long countComments;
 }
