@@ -15,4 +15,6 @@ public class SearchRequest {
     //фильтры
     private int page;
     private int size;
+    private double maxPrice = Double.MAX_VALUE;
+    private double minPrice = Double.MIN_VALUE;
 }

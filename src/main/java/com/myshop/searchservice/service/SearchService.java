@@ -4,9 +4,11 @@ package com.myshop.searchservice.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
 import com.myshop.searchservice.DTO.ProductForSearch;
 import com.myshop.searchservice.DTO.SearchRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -108,13 +110,14 @@ public class SearchService {
         }
 
         // Фильтр по цене
-//        if (searchRequest.getMinPrice() != null || searchRequest.getMaxPrice() != null) {
-//            RangeQuery.Builder range = new RangeQuery.Builder().field("price");
-//            if (searchRequest.getMinPrice() != null) range.gte(searchRequest.getMinPrice());
-//            if (searchRequest.getMaxPrice() != null) range.lte(searchRequest.getMaxPrice());
-//            bool.filter(range.build()._toQuery());
-//        }
-        //и так далее
+
+        RangeQuery.Builder range = new RangeQuery.Builder().field("price");
+        range.gte(JsonData.of(searchRequest.getMinPrice()));
+        range.lte(JsonData.of(searchRequest.getMaxPrice()));
+
+        bool.filter(range.build()._toQuery());
+
+
 
         return bool;
     }
