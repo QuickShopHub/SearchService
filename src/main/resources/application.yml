@@ -19,5 +19,3 @@ server:
 
 
 
-app:
-  api-key: ${API_KEY}
