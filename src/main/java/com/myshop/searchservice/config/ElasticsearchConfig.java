@@ -48,69 +48,28 @@ public class ElasticsearchConfig {
     @Value("${elasticsearch.password}")
     private String password;
 
-    @Value("${elasticsearch.use-ssl}")
-    private boolean useSsl;
 
 
 
 
-    @Value("${elasticsearch.truststore-path}")
-    private String truststorePath;
-    @Value("${elasticsearch.truststore-password}")
-    private String truststorePassword;
 
-    private SSLContext createSslContext() throws Exception {
-        log.info("Начинаем создание SSLContext...");
 
-        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        String resourcePath = truststorePath.replace("classpath:", "");
-        log.info("Ищем truststore по пути: {}", resourcePath);
-
-        try (InputStream is = ElasticsearchConfig.class.getClassLoader().getResourceAsStream(resourcePath)) {
-            if (is == null) {
-                log.error("Truststore не найден: {}", resourcePath);
-                throw new IllegalArgumentException("Truststore не найден: " + resourcePath);
-            }
-            trustStore.load(is, truststorePassword.toCharArray());
-            log.info("Truststore успешно загружен");
-        }
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(trustStore);
-
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, tmf.getTrustManagers(), null);
-
-        log.info("SSLContext успешно создан");
-        return sslContext;
-    }
 
 
 
     @Bean
     public ElasticsearchClient elasticsearchClient() throws Exception {
-        log.info("Настройка подключения к Elasticsearch: https://{}:{}", host, port);
+        log.info("Настройка подключения к Elasticsearch: {}://{}:{}", "http", host, port);
 
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-        RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, "https"));
+        // Используем правильный протокол
+        RestClientBuilder builder = RestClient.builder(new HttpHost(host, port, "http"));
 
-        if (useSsl) {
-            // Вот здесь вызывается createSslContext()
-            SSLContext sslContext = createSslContext();
-
-            builder.setHttpClientConfigCallback(httpAsyncClientBuilder ->
-                    httpAsyncClientBuilder
-                            .setDefaultCredentialsProvider(credentialsProvider)
-                            .setSSLContext(sslContext)  // ← используем созданный SSLContext
-            );
-        } else {
-            builder.setHttpClientConfigCallback(httpAsyncClientBuilder ->
-                    httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
-            );
-        }
+        builder.setHttpClientConfigCallback(httpAsyncClientBuilder ->
+                httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
+        );
 
         ElasticsearchTransport transport = new RestClientTransport(builder.build(), new JacksonJsonpMapper());
         return new ElasticsearchClient(transport);
@@ -126,7 +85,15 @@ public class ElasticsearchConfig {
                     .exists(b -> b.index("products"));
 
             if (!existsResponse.value()) {
-                throw new RuntimeException("Индекс 'products' отсутствует");
+                log.info("Создаём индекс 'products'...");
+                CreateIndexResponse createResponse = elasticsearchClient.indices()
+                        .create(b -> b.index("products"));
+
+                if (createResponse.acknowledged()) {
+                    log.info("Индекс 'products' успешно создан");
+                } else {
+                    log.warn("Не удалось создать индекс 'products'");
+                }
             } else {
                 log.info("Индекс 'products' уже существует");
             }

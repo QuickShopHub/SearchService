@@ -1,21 +1,14 @@
 
 
 elasticsearch:
-  host: localhost
-  port: 9200
+  host: ${ELASTIC_HOST}
+  port: ${ELASTIC_PORT}
   username: ${name_to_elastic}
   password: ${password_to_elastic}
-  use-ssl: true
-  truststore-path: classpath:elasticsearch-truststore.jks
-  truststore-password: ${password_to_certificate}
 
 server:
   port: 8081
-  ssl:
-    enabled: true
-    key-store: classpath:keystore.p12  # путь к .p12 файлу
-    key-store-password: changeit  # пароль от .p12
-    key-store-type: PKCS12
 
-
-
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVER}
